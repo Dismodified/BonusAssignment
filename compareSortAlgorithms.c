@@ -49,69 +49,91 @@ void heapify(int arr[], int n, int i) {
 }
 
 void heapSort(int arr[], int n) {
-    for (int i = n / 2 - 1; i >= 0; i--)
-        heapify(arr, n, i);
+    int *tempArray = (int *)Alloc(sizeof(int) * n);
+    if (tempArray == NULL) {
+        printf("Memory allocation failed\n");
+        return;
+    }
+
+    for (int i = 0; i < n; i++) {
+        tempArray[i] = arr[i];
+    }
+
+    for (int i = n / 2 - 1; i >= 0; i--) {
+        heapify(tempArray, n, i);
+    }
 
     for (int i = n - 1; i > 0; i--) {
-        int temp = arr[0];
-        arr[0] = arr[i];
-        arr[i] = temp;
+        int temp = tempArray[0];
+        tempArray[0] = tempArray[i];
+        tempArray[i] = temp;
 
-        heapify(arr, i, 0);
+        heapify(tempArray, i, 0);
     }
+
+    for (int i = 0; i < n; i++) {
+        arr[i] = tempArray[i];
+    }
+
+    DeAlloc(tempArray);
 }
 
 // implement merge sort
 // extraMemoryAllocated counts bytes of extra memory allocated
-void merge(int arr[], int l, int m, int r) {
-    int i, j, k;
+void merge(int pData[], int l, int m, int r)
+{
     int n1 = m - l + 1;
     int n2 = r - m;
 
+    // allocate memory using alloc
     int *L = (int *)Alloc(sizeof(int) * n1);
     int *R = (int *)Alloc(sizeof(int) * n2);
 
-    for (i = 0; i < n1; i++)
-        L[i] = arr[l + i];
-    for (j = 0; j < n2; j++)
-        R[j] = arr[m + 1 + j];
+    for (int i = 0; i < n1; i++)
+        L[i] = pData[l + i];
+    for (int j = 0; j < n2; j++)
+        R[j] = pData[m + 1 + j];
 
-    i = 0;
-    j = 0;
-    k = l;
+    int i = 0;
+    int j = 0;
+    int k = l; 
     while (i < n1 && j < n2) {
         if (L[i] <= R[j]) {
-            arr[k] = L[i];
+            pData[k] = L[i];
             i++;
         } else {
-            arr[k] = R[j];
+            pData[k] = R[j];
             j++;
         }
         k++;
     }
 
     while (i < n1) {
-        arr[k] = L[i];
+        pData[k] = L[i];
         i++;
         k++;
     }
 
     while (j < n2) {
-        arr[k] = R[j];
+        pData[k] = R[j];
         j++;
         k++;
     }
 
+    // deallocate memory using dealloc
     DeAlloc(L);
     DeAlloc(R);
 }
 
-void mergeSort(int arr[], int l, int r) {
+// implement merge sort
+// extraMemoryAllocated counts bytes of extra memory allocated
+void mergeSort(int pData[], int l, int r)
+{
     if (l < r) {
         int m = l + (r - l) / 2;
-        mergeSort(arr, l, m);
-        mergeSort(arr, m + 1, r);
-        merge(arr, l, m, r);
+        mergeSort(pData, l, m);
+        mergeSort(pData, m + 1, r);
+        merge(pData, l, m, r);
     }
 }
 
@@ -270,7 +292,7 @@ int main(void)
 		memcpy(pDataCopy, pDataSrc, dataSz*sizeof(int));
 		extraMemoryAllocated = 0;
 		start = clock();
-		heapSort(pDataCopy, 0, dataSz - 1);
+		heapSort(pDataCopy, dataSz);
 		end = clock();
 		cpu_time_used = ((double) (end - start)) / CLOCKS_PER_SEC;
 		printf("\truntime\t\t\t: %.1lf\n",cpu_time_used);
