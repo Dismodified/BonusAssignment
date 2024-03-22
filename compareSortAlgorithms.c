@@ -48,34 +48,27 @@ void heapify(int arr[], int n, int i) {
     }
 }
 
+// main function to do heap sort
 void heapSort(int arr[], int n) {
-    int *tempArray = (int *)Alloc(sizeof(int) * n);
-    if (tempArray == NULL) {
-        printf("Memory allocation failed\n");
-        return;
-    }
+    int *heap = (int *)Alloc(sizeof(int) * n);
 
-    for (int i = 0; i < n; i++) {
-        tempArray[i] = arr[i];
-    }
+    memcpy(heap, arr, sizeof(int) * n);
 
-    for (int i = n / 2 - 1; i >= 0; i--) {
-        heapify(tempArray, n, i);
-    }
+    for (int i = n / 2 - 1; i >= 0; i--)
+        heapify(heap, n, i);
 
     for (int i = n - 1; i > 0; i--) {
-        int temp = tempArray[0];
-        tempArray[0] = tempArray[i];
-        tempArray[i] = temp;
 
-        heapify(tempArray, i, 0);
+        int temp = heap[0];
+        heap[0] = heap[i];
+        heap[i] = temp;
+
+        heapify(heap, i, 0);
     }
 
-    for (int i = 0; i < n; i++) {
-        arr[i] = tempArray[i];
-    }
+    memcpy(arr, heap, sizeof(int) * n);
 
-    DeAlloc(tempArray);
+    DeAlloc(heap);
 }
 
 // implement merge sort
@@ -139,70 +132,94 @@ void mergeSort(int pData[], int l, int r)
 
 // implement insertion sort
 // extraMemoryAllocated counts bytes of memory allocated
-void insertionSort(int* pData, int n) {
-    int i, j, key;
+void insertionSort(int arr[], int n) {
+    int *temp = (int *)Alloc(sizeof(int) * n);
+    memcpy(temp, arr, sizeof(int) * n);
+
+    int i, key, j;
     for (i = 1; i < n; i++) {
-        key = pData[i];
+        key = temp[i];
         j = i - 1;
-        while (j >= 0 && pData[j] > key) {
-            pData[j + 1] = pData[j];
+
+        while (j >= 0 && temp[j] > key) {
+            temp[j + 1] = temp[j];
             j = j - 1;
         }
-        pData[j + 1] = key;
+        temp[j + 1] = key;
     }
+
+
+    memcpy(arr, temp, sizeof(int) * n);
+
+    DeAlloc(temp);
 }
 
 // implement bubble sort
 // extraMemoryAllocated counts bytes of extra memory allocated
-void bubbleSort(int* pData, int n) {
+void bubbleSort(int arr[], int n) {
+    int *temp = (int *)Alloc(sizeof(int) * n);
+
+    memcpy(temp, arr, sizeof(int) * n);
+
     int i, j;
-    for (i = 0; i < n - 1; i++) {
-        for (j = 0; j < n - i - 1; j++) {
-            if (pData[j] > pData[j + 1]) {
-                // Swap pData[j] and pData[j+1]
-                int temp = pData[j];
-                pData[j] = pData[j + 1];
-                pData[j + 1] = temp;
+    for (i = 0; i < n - 1; i++)
+
+        for (j = 0; j < n - i - 1; j++)
+            if (temp[j] > temp[j + 1]) {
+                int tempVal = temp[j];
+                temp[j] = temp[j + 1];
+                temp[j + 1] = tempVal;
             }
-        }
-    }
+
+    memcpy(arr, temp, sizeof(int) * n);
+
+    DeAlloc(temp);
 }
 
 // implement selection sort
 // extraMemoryAllocated counts bytes of extra memory allocated
-void selectionSort(int* pData, int n) {
-    int i, j, minIdx;
+void selectionSort(int arr[], int n) {
+    int *temp = (int *)Alloc(sizeof(int) * n);
+
+    memcpy(temp, arr, sizeof(int) * n);
+
+    int i, j, min_idx;
+
     for (i = 0; i < n - 1; i++) {
-        minIdx = i;
-        for (j = i + 1; j < n; j++) {
-            if (pData[j] < pData[minIdx]) {
-                minIdx = j;
-            }
-        }
-        if (minIdx != i) {
-            // Swap pData[i] and pData[minIdx]
-            int temp = pData[i];
-            pData[i] = pData[minIdx];
-            pData[minIdx] = temp;
-        }
+
+        min_idx = i;
+        for (j = i + 1; j < n; j++)
+            if (temp[j] < temp[min_idx])
+                min_idx = j;
+
+        int tempVal = temp[min_idx];
+        temp[min_idx] = temp[i];
+        temp[i] = tempVal;
     }
+
+    memcpy(arr, temp, sizeof(int) * n);
+
+    DeAlloc(temp);
 }
 
 // parses input file to an integer array
 int parseData(char *inputFileName, int **ppData)
 {
-	FILE* inFile = fopen(inputFileName,"r");
-	int dataSz = 0;
-	*ppData = NULL;
-	
-	if (inFile)
-	{
-		fscanf(inFile,"%d\n",&dataSz);
-		*ppData = (int *)Alloc(sizeof(int) * dataSz);
-		// Implement parse data block
-	}
-	
-	return dataSz;
+  FILE* inFile = fopen(inputFileName,"r");
+  int dataSz = 0;
+  *ppData = NULL;
+
+  if (inFile)
+  {
+    fscanf(inFile,"%d\n",&dataSz);
+    *ppData = (int *)Alloc(sizeof(int) * dataSz);
+    for (int i = 0; i < dataSz; i++) {
+            fscanf(inFile, "%d", &((*ppData)[i]));
+        }
+        fclose(inFile);
+  }
+
+  return dataSz;
 }
 
 // prints first and last 100 items in the data array
