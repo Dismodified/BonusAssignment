@@ -205,32 +205,21 @@ void selectionSort(int arr[], int n) {
 // parses input file to an integer array
 int parseData(char *inputFileName, int **ppData)
 {
-	FILE* inFile = fopen(inputFileName,"r");
-	int dataSz = 0;
-	int i, n, *data;
-	*ppData = NULL;
-	
-	if (inFile)
-	{
-		fscanf(inFile,"%d\n",&dataSz);
-		*ppData = (int *)malloc(sizeof(int) * dataSz);
-		// Implement parse data block
-		if (*ppData == NULL)
-		{
-			printf("Cannot allocate memory\n");
-			exit(-1);
-		}
-		for (i=0;i<dataSz;++i)
-		{
-			fscanf(inFile, "%d ",&n);
-			data = *ppData + i;
-			*data = n;
-		}
+  FILE* inFile = fopen(inputFileName,"r");
+  int dataSz = 0;
+  *ppData = NULL;
 
-		fclose(inFile);
-	}
-	
-	return dataSz;
+  if (inFile)
+  {
+    fscanf(inFile,"%d\n",&dataSz);
+    *ppData = (int *)Alloc(sizeof(int) * dataSz);
+    for (int i = 0; i < dataSz; i++) {
+            fscanf(inFile, "%d", &((*ppData)[i]));
+        }
+        fclose(inFile);
+  }
+
+  return dataSz;
 }
 
 // prints first and last 100 items in the data array
